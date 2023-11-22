@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/style.css">
+    <title>Dashboard</title>
+</head>
+<body>
+    <header>
+        <h1>Stave Tech Blog</h1>
+        <nav>
+            <ul>
+                <li><a href="/" id="home">Home</a></li>
+                <li><a href="/dashboard" id="dashboard">Dashboard</a></li>
+                <li><a href="/logout" id="logout">Logout</a></li>
+                <li><a href="/login" id="loginButton">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main id="main-content">
+        <h2>Dashboard</h2>
+
+        <div class="post-container">
+        </div>
+
+        <h3>Add New Post</h3>
+        <form id="addPostForm">
+            <label for="postTitle">Title:</label>
+            <input type="text" id="postTitle" required>
+            
+            <label for="postContents">Contents:</label>
+            <textarea id="postContents" required></textarea>
+            
+            <button type="button" id="createPostBtn">Create Post</button>
+        </form>
+    </main>
+
+    <script src="../public/script.js"></script>
+</body>
+</html>

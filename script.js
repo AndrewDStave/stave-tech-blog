@@ -1,64 +1,105 @@
-let postsData = [];
+const express = require('express');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
+const { Sequelize, DataTypes } = require('sequelize');
 
-let currentUser;
+dotenv.config();
 
-// Page navigation
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("home").addEventListener("click", loadHomePage);
-    document.getElementById("dashboard").addEventListener("click", loadDashboard);
-    document.getElementById("logout").addEventListener("click", logout);
+const app = express();
+const port = process.env.PORT || 3000;
 
-    loadHomePage();
+const sequelize = new Sequelize({
+  dialect: 'mysql',
+  host: process.env.DB_HOST,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
-function loadHomePage() {
-    document.getElementById("main-content").innerHTML = "<h2>Home Page</h2>";
-}
+const User = sequelize.define('User', {
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
 
-function loadDashboard() {
-    let dashboardContent = "<h2>Dashboard</h2>";
+const sessionStore = new SequelizeStore({
+  db: sequelize,
+});
 
-    postsData.forEach(post => {
-        dashboardContent += `<div>
-                                <h3>${post.title}</h3>
-                                <p>${post.contents}</p>
-                              </div>`;
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: true,
+  store: sessionStore,
+}));
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/views/index.html');
+});
+
+app.get('/dashboard', (req, res) => {
+  if (req.session.user) {
+    res.sendFile(__dirname + '/views/dashboard.html');
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/views/login.html');
+});
+
+app.get('/signup', (req, res) => {
+  res.sendFile(__dirname + '/views/signup.html');
+});
+
+app.post('/signup', async (req, res) => {
+  const { username, } = req.body;
+
+    const newUser = await User.create({
+      username: username,
+      password: hashedPassword,
     });
 
-    dashboardContent += `<h3>Add New Post</h3>
-                        <form id="addPostForm">
-                            <label for="postTitle">Title:</label>
-                            <input type="text" id="postTitle" required>
-                            
-                            <label for="postContents">Contents:</label>
-                            <textarea id="postContents" required></textarea>
-                            
-                            <button type="button" onclick="createPost()">Create Post</button>
-                        </form>`;
+    console.log('User created:', newUser);
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
-    document.getElementById("main-content").innerHTML = dashboardContent;
-}
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
 
-function createPost() {
-    const title = document.getElementById("postTitle").value;
-    const contents = document.getElementById("postContents").value;
+  try {
+    const user = await User.findOne({
+      where: { username: username },
+    });
 
-    if (title && contents) {
-        const newPost = {
-            id: generateUniqueId(),
-            title: title,
-            contents: contents,
-        };
-
-        postsData.push(newPost);
-        loadDashboard();
+    if (user && await bcrypt.compare(password, user.password)) {
+      req.session.user = user;
+      res.redirect('/dashboard');
+    } else {
+      res.redirect('/login');
     }
-}
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
-function logout() {
-    alert("Logout clicked");
-}
-
-function generateUniqueId() {
-    return Math.floor(Math.random() * 1000000);
-}
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});

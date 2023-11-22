@@ -1,0 +1,84 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #4e3318; /* Dark brown background color */
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #c3e6cb; /* Light green container background color */
+    border: 5px solid #8d6d4d; /* Dark brown border color */
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+header {
+    background-color: #276651; /* Dark green header background color */
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+main {
+    padding: 20px;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    background-color: #c3e6cb; /* Light green container background color */
+    border: 5px solid #8d6d4d; /* Dark brown border color */
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+}
+
+.login-container h2 {
+    color: #276651; /* Dark green color for header */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 10px;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+button {
+    padding: 10px;
+    background-color: #276651;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1a4731;
+}
+
+footer {
+    background-color: #276651;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
